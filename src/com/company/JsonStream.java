@@ -16,22 +16,39 @@ public class JsonStream implements Runnable
     private boolean isFirstLine = true;
     public JsonStream()
     {
-        lineQueue = new LinkedList<String>();
+        //lineQueue = new LinkedList<String>();
         try {
             telnet = new Telnet(CONN_PORT);
 
-            System.out.println("Telnet server created... Waiting for incoming connection on port: " + CONN_PORT);
+            System.out.println("Telnet server created...");
 
-            telnet.run();
+            //before now, the telnet thread was started here.
 
-            System.out.println("Telnet server running!");
+            //telnetThread.
 
-            dataStream = telnet.getInputStream();
+            //System.out.println("Telnet server running!");
 
-            System.out.println("DataStream set.");
+            //dataStream = telnet.getInputStream();
+
+            //System.out.println("DataStream set.");
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public void setCommandQueue(Queue<String> cq)
+    {
+        lineQueue = cq;
+    }
+
+    public void setDataStream(InputStream i)
+    {
+        dataStream = i;
+    }
+
+    public Telnet getTelnet()
+    {
+        return telnet;
     }
 
     public Queue<String> getLineQueue()
@@ -50,32 +67,38 @@ public class JsonStream implements Runnable
 
         String curLine      = "";
         int lineChars       = 0;
-        while(true)
-        {
-            try {
-                if(dataStream.available() > 0)
-                {
-                    lineChars       = dataStream.available();
-                    for(int i = 0; i < lineChars; i++) {
-                        //and add the char to the current line String
-                        curLine     += (char) dataStream.read();
+        while(true) {
+            if (dataStream != null) {
+                try {
+                    if (dataStream.available() > 0) {
+                        lineChars = dataStream.available();
+                        for (int i = 0; i < lineChars; i++) {
+                            //and add the char to the current line String
+                            curLine += (char) dataStream.read();
+                        }
+                        if (!isFirstLine) {
+                            lineQueue.add(curLine);
+                            System.out.println("a new line should be added to the line queue.");
+                            curLine = "";
+                            lineChars = 0;
+                        } else {
+                            curLine = "";
+                            lineChars = 0;
+                            isFirstLine = false;
+                        }
                     }
-                    if(!isFirstLine) {
-                        lineQueue.add(curLine);
-                        System.out.println("a new line should be added to the line queue.");
-                        System.out.println("line: " + curLine);
-                        curLine = "";
-                        lineChars = 0;
-                    }
-                    else
-                    {
-                        curLine = "";
-                        lineChars = 0;
-                        isFirstLine = false;
-                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
-            } catch (IOException e) {
-                e.printStackTrace();
+            }
+            else
+            {
+                try {
+                    System.out.println("Setting data stream");
+                    dataStream = telnet.getInputStream();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
         }
     }

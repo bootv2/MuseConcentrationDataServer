@@ -65,6 +65,8 @@ public class Telnet implements Runnable
                     try
                     {
                         System.out.println("Connection accepted... waiting for commands...");
+                        //clientSocket.wait();
+                        //System.out.println("[T] the socket associated with the telnet client is now waiting");
                         break;
                     }
                     catch (Exception e)
@@ -82,7 +84,24 @@ public class Telnet implements Runnable
                 stop();
             }
         }
-        System.out.println("Server creation Success!!!");
+        System.out.println("[!]Server connected to client Success!!!");
+        return;
+    }
+
+    /***
+     * Stop the listener thread
+     ***/
+    public void stop()
+    {
+        listener.interrupt();
+        try
+        {
+            serverSocket.close();
+        }
+        catch (Exception e)
+        {
+            System.err.println("Exception in close, "+ e.getMessage());
+        }
     }
 
 
@@ -101,22 +120,6 @@ public class Telnet implements Runnable
             {
                 System.err.println("Exception in notify, "+ e.getMessage());
             }
-        }
-    }
-
-    /***
-     * Stop the listener thread
-     ***/
-    public void stop()
-    {
-        listener.interrupt();
-        try
-        {
-            serverSocket.close();
-        }
-        catch (Exception e)
-        {
-            System.err.println("Exception in close, "+ e.getMessage());
         }
     }
 
