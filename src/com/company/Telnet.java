@@ -32,6 +32,7 @@ public class Telnet implements Runnable
     ServerSocket serverSocket = null;
     Socket clientSocket = null;
     Thread listener = null;
+    InputStream incomingData;
 
     /***
      * test of client-driven subnegotiation.
@@ -54,8 +55,7 @@ public class Telnet implements Runnable
      ***/
     public void run()
     {
-        boolean bError = false;
-        while(!bError)
+        while(true)
         {
             try
             {
@@ -65,35 +65,19 @@ public class Telnet implements Runnable
                     try
                     {
                         System.out.println("Connection accepted... waiting for commands...");
-                        clientSocket.wait();
+                        break;
                     }
                     catch (Exception e)
                     {
                         System.err.println("Exception in wait, "+ e.getMessage());
                     }
-                    try
-                    {
-                        clientSocket.close();
-                    }
-                    catch (Exception e)
-                    {
-                        System.err.println("Exception in close, "+ e.getMessage());
-                    }
+                    stop();
                 }
             }
             catch (IOException e)
             {
-                bError = true;
+                stop();
             }
-        }
-
-        try
-        {
-            serverSocket.close();
-        }
-        catch (Exception e)
-        {
-            System.err.println("Exception in close, "+ e.getMessage());
         }
     }
 
