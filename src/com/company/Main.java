@@ -20,7 +20,7 @@ public class Main {
 
         synchronized (this) {
             try {
-                this.wait(5000);
+                this.wait(500);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
