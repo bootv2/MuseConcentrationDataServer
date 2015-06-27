@@ -11,6 +11,8 @@ public class Main {
 
         s.run();
 
+        //System.out.println("Datastream reader set up!");
+
 
     }
 }

@@ -76,9 +76,13 @@ public class Telnet implements Runnable
             }
             catch (IOException e)
             {
+                System.out.println("Error accepting connection...");
+                e.printStackTrace();
+                System.out.println("Stopping server...");
                 stop();
             }
         }
+        System.out.println("Server creation Success!!!");
     }
 
 

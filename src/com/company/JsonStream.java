@@ -13,17 +13,22 @@ public class JsonStream implements Runnable
     private static final int CONN_PORT = 5555;
     private InputStream dataStream;
     private Telnet telnet;
+    private boolean isFirstLine = true;
     public JsonStream()
     {
         lineQueue = new LinkedList<String>();
         try {
             telnet = new Telnet(CONN_PORT);
 
-            System.out.println("Telnet server created...");
+            System.out.println("Telnet server created... Waiting for incoming connection on port: " + CONN_PORT);
 
             telnet.run();
 
+            System.out.println("Telnet server running!");
+
             dataStream = telnet.getInputStream();
+
+            System.out.println("DataStream set.");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -55,11 +60,19 @@ public class JsonStream implements Runnable
                         //and add the char to the current line String
                         curLine     += (char) dataStream.read();
                     }
-                    lineQueue.add(curLine);
-                    System.out.println("a new line should be added to the line queue.");
-                    System.out.println("line: " + curLine);
-                    curLine         = "";
-                    lineChars       = 0;
+                    if(!isFirstLine) {
+                        lineQueue.add(curLine);
+                        System.out.println("a new line should be added to the line queue.");
+                        System.out.println("line: " + curLine);
+                        curLine = "";
+                        lineChars = 0;
+                    }
+                    else
+                    {
+                        curLine = "";
+                        lineChars = 0;
+                        isFirstLine = false;
+                    }
                 }
             } catch (IOException e) {
                 e.printStackTrace();
